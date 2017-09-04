@@ -70,10 +70,10 @@ def ListSort(inputList,ListRanks):
   return NodeNames
  
 class IMTGraph:
-"""
-Describe a graph. Currently, only undirected, unweighted graph are available.
-Nodes (vertices) are labelled with integers from 0 to (number_of_nodes-1)
-"""
+	"""
+	Describe a graph. Currently, only undirected, unweighted graph are available.
+	Nodes (vertices) are labelled with integers from 0 to (number_of_nodes-1)
+	"""
 	
 	def __init__(self):
 		self.nodes_names = []
