@@ -30,14 +30,6 @@ class AgglomerativeHierarchical_ocl:
 
 	def __init__(self, G, n_proc=10, n_added=10):
 		self.G = G
-		# Find the max number of work items
-		# device = context.devices[0]
-		# nwork_groups = device.max_compute_units
-		# work_group_size = find_neighbor.get_work_group_info(cl.kernel_work_group_info.WORK_GROUP_SIZE, device)
-		# n_max = nwork_groups*work_group_size
-		# if n_proc == "max" or n_proc>n_max:
-			# self.n_proc = n_max
-		# else:
 		self.n_proc = n_proc
 		self.n_added=n_added
 
@@ -94,6 +86,7 @@ class AgglomerativeHierarchical_ocl:
 		}
 		"""
 		
+		# Initialisation
 		program = cl.Program(context, kernelsource).build()
 		find_neighbor = program.find_neighbor
 		find_neighbor.set_scalar_arg_dtypes([np.int64, None, None, None, None, None, None, None, None])
@@ -121,8 +114,8 @@ class AgglomerativeHierarchical_ocl:
 		copy_time = 0
 		merge_list = []
 		
+		# Perform clustering
 		while N>1:
-			# print(N)
 			time0 = time()
 			p = min(self.n_proc, N)
 			neighb_table_buf = cl.Buffer(context, cl.mem_flags.READ_ONLY | cl.mem_flags.COPY_HOST_PTR, hostbuf=np.asarray(neighb_table, np.int64))
@@ -184,12 +177,11 @@ class AgglomerativeHierarchical_ocl:
 			new_neighb_table = []
 			new_edges_weights = []
 			new_nodes_weights = []
+			# copy the modified graph
 			for k in range(N):
 				pair_idx = custom_index(j_list, nodes_here[k])
 				if pair_idx==-1: #node_here[k] isn't a node_j to be suppressed
 					neighbors, new_edges_weights_tmp = get_neighbors(k, neighb_id, neighb_table, edges_weights)
-					# print(len(new_edges_weights_tmp))
-					# print(len(neighbors))
 					new_nodes_weights.append(nodes_weights[k])
 					for node_j in j_list: #change all edges going to node_j 
 						j_idx_in_neigh = custom_index(neighbors, node_j)
@@ -278,29 +270,3 @@ class AgglomerativeHierarchical_ocl:
 			for i in range(n_clusters):
 				for node in self.clusters[i]:
 					writer.writerow([self.G.nodes_names[node],i])
-
-		
-		
-if __name__ == '__main__':
-	filepath = '../facebook_combined.txt'
-	# filepath = 'test.txt'
-	# filepath = 'USA-road-d.NY.gr'
-	# filepath = '../zbmaths.csv'
-	delim=' '
-	n_proc = 10
-	n_added = 10
-
-	if len(sys.argv)>=2 :
-		filepath = sys.argv[1]
-	if len(sys.argv)>=3 :
-		n_proc = int(sys.argv[2])
-	if len(sys.argv)>=4:
-		n_added = int(sys.argv[3])
-	if len(sys.argv)>=5:
-		print('Too many arguments')
-		sys.exit()
-	time0 = time()
-	# G = IMTGraph.read_csv(filepath, delim, (1,2), skipline=7)
-	G = IMTGraph.read_csv(filepath, delim)
-	print("File loaded in "+str(time()-time0)+"s")
-	clustering(G, n_proc, n_added)

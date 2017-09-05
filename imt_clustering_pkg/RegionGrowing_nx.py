@@ -18,8 +18,9 @@ class RegionGrowing_nx:
 			self.n_clusters = len(seed)
 			self.nodes_seed = seed
 		else:
-			print('2nd argument "seed" expects a list of starting points or an integer used for random generation')
-			return()
+			random.seed(time())
+			self.nodes_seed = random.sample(range(n_nodes),n_clusters)
+			self.n_clusters = n_clusters
 		self.itermax = itermax
 
 # Computing clusters
@@ -85,38 +86,3 @@ class RegionGrowing_nx:
 					for node in self.clusters[i]:
 						writer.writerow([node,i])
 	
-if __name__ == '__main__':
-	time0 = time()
-	filepath = '../data/facebook_combined.txt'
-	seed = 42
-	k = 5
-	delim=' '
-	qtchar='%'
-
-	# Usage: python RegionsGrowing_nx filepath seed_number k
-	if len(sys.argv)>=2 :
-		filepath = sys.argv[1]
-	if len(sys.argv)>=3:
-		seed = int(sys.argv[2])
-	if len(sys.argv)>=4:
-		k = int(sys.argv[3])
-	if len(sys.argv)>=5:
-		print('Usage: python RegionsGrowing_nx filepath seed number_of_clusters')
-		sys.exit()
-
-	# Loading the graph
-	G=nx.Graph()
-	with open(filepath,'r') as csvfile:
-		data = csv.reader(csvfile, delimiter=delim, quotechar=qtchar)
-		for row in data:
-				G.add_edge(row[0],row[1])
-
-	n = G.number_of_nodes()
-	m = G.number_of_edges()
-	load_time = time() - time0
-	print("The file "+filepath+" was loaded in " + str(load_time)+"s and contains "+str(n)+" nodes and "+str(m)+" edges.")
-
-	init_time = time()
-	C = RegionGrowing_nx(G, k, seed, 10000)
-	C.fit()
-	print(time()-init_time)

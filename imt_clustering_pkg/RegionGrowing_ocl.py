@@ -3,7 +3,6 @@ import numpy as np
 import csv
 import random
 import sys
-# from IMTGraph import IMTGraph
 from time import time
 
 class RegionGrowing_ocl:
@@ -20,7 +19,7 @@ class RegionGrowing_ocl:
 		else:
 			random.seed(time())
 			self.nodes_seed = random.sample(range(n_nodes),n_clusters)
-			self.n_clusters = n_clusters			
+			self.n_clusters = n_clusters
 		self.itermax = itermax
 		self.clusters = np.array([-1 for x in range(n_nodes)], np.int32)
 	
@@ -65,8 +64,6 @@ class RegionGrowing_ocl:
 				}
 			}
 		}
-
-
 
 		__kernel void count_cluster(
 			const long n_nodes,
@@ -168,27 +165,3 @@ class RegionGrowing_ocl:
 			writer.writerow(['node','cluster'])
 			for i in range(self.G.nodes_number):
 				writer.writerow([self.G.nodes_names[i],self.clusters[i]])
-
-
-if __name__ == '__main__':
-	filepath = '../data/facebook_combined.txt'
-	seed = 42
-	k = 5
-	delim=' '
-
-	if len(sys.argv)>=2 :
-		filepath = sys.argv[1]
-	if len(sys.argv)>=3:
-		seed = int(sys.argv[2])
-	if len(sys.argv)>=4:
-		k = int(sys.argv[3])
-	if len(sys.argv)>=5:
-		print('Usage: python RegionsGrowing_ocl filepath seed number_of_clusters')
-		sys.exit()
-	time0 = time()
-	G = IMTGraph.read_csv(filepath, delim)
-	print("File loaded in "+str(time()-time0)+"s")
-	C = RegionGrowing_ocl(G, k, seed, 10000)
-	C.fit()
-	C.save_csv()
-

@@ -8,10 +8,10 @@ NetworkX (optionnal)
 Example of use:
 
 import imt_clustering_pkg as imt_clus
-G=imt_clus.IMTGraph.read_csv(filepath, delimiter=' ', columns = (0,1), skipline=0)
+G=imt_clus.IMTGraph.read_csv('data/facebook_combined.txt', delimiter=' ', columns = (0,1), skipline=0)
 C=imt_clus.RegionsGrowing_ocl(G, n_clusters=5, seed=42, itermax=1000)
 C.fit()
-C.save_csv(filpath='clusters.csv', delimiter=' ')
+C.save_csv(path='clusters.csv', delim=' ')
 
 some graphs can be tested in data/
 
